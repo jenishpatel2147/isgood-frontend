@@ -4,13 +4,16 @@ import authHeader from "./header";
 const API_URL = "http://localhost:8000/api/";
 
 class UserService {
-  createOrg(organisationName, website) {
+  createOrg(organisationName, website, token) {
     const data = {
       name: organisationName,
       url: website,
     };
+
     return axios.post(API_URL + "org/create", data, {
-      headers: authHeader(),
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
   }
   getOrg() {
