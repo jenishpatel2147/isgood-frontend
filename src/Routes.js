@@ -13,6 +13,7 @@ import CreateProject from "./containers/initial-setup-pages/CreateProject/Create
 import CreateProject2 from "./containers/initial-setup-pages/CreateProject/CreateProject2";
 import Personalise from "./containers/initial-setup-pages/Personalise";
 import { UserProvider } from "./context/UserContext";
+import MyOrganisations from "./containers/my-organisation/MyOrganisations";
 
 export default function Routes() {
   return (
@@ -26,6 +27,12 @@ export default function Routes() {
       <Route exact path="/projectform" component={ProjectForm} />
       <UserProvider>
         <ProtectedRoute exact path="/myprojects" component={MyProjects} />
+
+        <ProtectedRoute
+          exact
+          path="/myorganisations"
+          component={MyOrganisations}
+        />
 
         <ProtectedRoute exact path="/welcome" component={Welcome} />
 
