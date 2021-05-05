@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import Form from "react-bootstrap/Form";
 import { Col, Button } from "react-bootstrap";
 import { useHistory } from "react-router-dom";
@@ -8,11 +8,13 @@ import HomePageNavbar from "../../components/HomePageNavbar";
 import * as Yup from "yup";
 import FormErrorMessage from "../../components/FormErrorMessage";
 import { useAuth0 } from "@auth0/auth0-react";
+import UserContext from "../../context/UserContext";
 
 export default function CreateOrganisation() {
   const [serverMessage, setServerMessage] = useState();
   const history = useHistory();
   const { getAccessTokenSilently } = useAuth0();
+  const { user, setUser } = useContext(UserContext);
 
   const validationSchema = Yup.object().shape({
     organisationName: Yup.string().required("Required"),
@@ -49,7 +51,7 @@ export default function CreateOrganisation() {
               sector: "Choose....",
             }}
             validationSchema={validationSchema}
-            onSubmit={async (values) => {
+            onSubmit={async (values, methods) => {
               try {
                 const token = await getAccessTokenSilently();
 
@@ -58,8 +60,12 @@ export default function CreateOrganisation() {
                   values.website,
                   token
                 );
-                console.log(res);
-                // history.push("/createproject");
+
+                setUser((state) => {
+                  return { ...state, currentOrgId: res.data.orgId };
+                });
+                methods.resetForm();
+                history.push("/createproject");
               } catch (err) {
                 const errMessage = err.response.data["error"];
                 setServerMessage(errMessage);

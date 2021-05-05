@@ -9,7 +9,6 @@ class UserService {
       name: organisationName,
       url: website,
     };
-
     return axios.post(API_URL + "org/create", data, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -20,7 +19,14 @@ class UserService {
     return axios.get(API_URL + "org");
   }
 
-  createProject(orgId, name, description, projectImpacts, outcomesDesired) {
+  createProject(
+    orgId,
+    name,
+    description,
+    projectImpacts,
+    outcomesDesired,
+    token
+  ) {
     const data = {
       orgId: orgId,
       name: name,
@@ -29,7 +35,9 @@ class UserService {
       outcomesDesired: outcomesDesired,
     };
     return axios.post(API_URL + "project/create", data, {
-      headers: authHeader(),
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
   }
 
