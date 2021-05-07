@@ -8,24 +8,24 @@ import UserService from "../../services/user";
 import { useRouteMatch } from "react-router-dom";
 import { LinkContainer } from "react-router-bootstrap";
 
-export default function OrganisationsLayout() {
+export default function ProjectsLayout() {
   const { getAccessTokenSilently } = useAuth0();
   const { user, setUser } = useContext(UserContext);
   const { path, url } = useRouteMatch();
 
   useEffect(() => {
-    const getOrgs = async () => {
+    const getProjects = async () => {
       try {
         const token = await getAccessTokenSilently();
-        const res = await UserService.getOrg(token);
+        const res = await UserService.getProjectByUser(token);
         console.log(res.data);
         console.log(res);
-        setUser((prev) => ({ ...prev, userOrgs: res.data }));
+        setUser((prev) => ({ ...prev, userProjects: res.data }));
       } catch (err) {
         console.log(err);
       }
     };
-    getOrgs();
+    getProjects();
   }, []);
   console.log(user);
   return (
@@ -40,16 +40,22 @@ export default function OrganisationsLayout() {
         </Col>
       </Row>
       <Row className="d-flex justify-content-center py-5">
-        {user.userOrgs &&
-          user.userOrgs.map((org, index) => (
-            <Col key={org.orgId} md={2} sm={3} xs={5} className="p-1 m-2">
-              <LinkContainer to={`myorganisations/${org.orgId}`}>
+        {user.userProjects &&
+          user.userProjects.map((project, index) => (
+            <Col
+              key={project.projectId}
+              md={2}
+              sm={3}
+              xs={5}
+              className="p-1 m-2"
+            >
+              <LinkContainer to={`myprojects/${project.projectId}`}>
                 <div className="card d-flex justify-content-center">
                   <img
                     src="https://placeimg.com/620/620/any"
                     alt="Organisation Logo"
                   />
-                  <h4 className="text-center">{org.name}</h4>
+                  <h4 className="text-center">{project.name}</h4>
                 </div>
               </LinkContainer>
             </Col>
