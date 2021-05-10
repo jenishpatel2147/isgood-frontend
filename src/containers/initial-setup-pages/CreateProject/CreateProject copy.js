@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import Form from "react-bootstrap/Form";
-import { Button, Card, Accordion } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import { useHistory } from "react-router-dom";
 import { Formik, FieldArray } from "formik";
 import HomePageNavbar from "../../../components/HomePageNavbar";
@@ -9,7 +9,6 @@ import * as Yup from "yup";
 import FormErrorMessage from "../../../components/FormErrorMessage";
 import { useAuth0 } from "@auth0/auth0-react";
 import UserContext from "../../../context/UserContext";
-import BeneficiaryGroups from "./BeneficiaryGroups";
 
 export default function CreateProject() {
   const [serverMessage, setServerMessage] = useState();
@@ -18,24 +17,11 @@ export default function CreateProject() {
   const { user, setUser } = useContext(UserContext);
 
   const validationSchema = Yup.object().shape({
-    orgId: Yup.string().required(),
+    orgId: Yup.string().required("Required").nullable(),
     projectName: Yup.string().required("Required"),
     description: Yup.string().required("Required"),
     impacts: Yup.array().of(Yup.string().required("Required")),
     outcomes: Yup.array().of(Yup.string().required("Required")),
-    beneficiaryGroups: Yup.array().of(
-      Yup.object().shape({
-        demoName: Yup.string().required("Required"),
-        groupChange: Yup.array().of(Yup.string().required("Required")),
-        demographics: Yup.array().of(
-          Yup.object().shape({
-            demographic: Yup.string().required("Required"),
-            operator: Yup.string().required("Required"),
-            value: Yup.string().required("Required"),
-          })
-        ),
-      })
-    ),
   });
 
   return (
@@ -56,18 +42,11 @@ export default function CreateProject() {
           </legend>
           <Formik
             initialValues={{
-              orgId: user.orgId,
+              orgId: user.currentOrgId,
               projectName: "",
               description: "",
               impacts: [""],
               outcomes: [""],
-              beneficiaryGroups: [
-                {
-                  demoName: "",
-                  groupChange: [""],
-                  demographics: [{ demographic: "", operator: "", value: "" }],
-                },
-              ],
             }}
             validationSchema={validationSchema}
             onSubmit={async (values, methods) => {
@@ -79,7 +58,6 @@ export default function CreateProject() {
                   values.description,
                   values.impacts,
                   values.outcomes,
-                  values.beneficiaryGroups,
                   token
                 );
                 // console.log(res);
@@ -220,23 +198,6 @@ export default function CreateProject() {
                     );
                   }}
                 </FieldArray>
-
-                <Accordion>
-                  <Card className="my-3">
-                    <Accordion.Toggle as={Card.Header} eventKey="0">
-                      Advance Fields
-                    </Accordion.Toggle>
-                    <Accordion.Collapse eventKey="0">
-                      <Card.Body>
-                        <FieldArray name="beneficiaryGroups">
-                          {(arrayHelpers) => (
-                            <BeneficiaryGroups arrayHelpers={arrayHelpers} />
-                          )}
-                        </FieldArray>
-                      </Card.Body>
-                    </Accordion.Collapse>
-                  </Card>
-                </Accordion>
 
                 <Button block size="lg" type="submit">
                   Next
