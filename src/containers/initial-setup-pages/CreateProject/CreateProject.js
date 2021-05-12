@@ -57,8 +57,9 @@ export default function CreateProject() {
       // move to next project form page
       history.push("/home/myprojects");
     } catch (err) {
-      const errMessage = err.response.data["error"];
-      setServerMessage(errMessage);
+      console.log(err.response.data);
+      // const errMessage = err.response.data["error"];
+      // setServerMessage(errMessage);
     }
   };
 
