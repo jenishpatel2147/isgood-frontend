@@ -23,13 +23,13 @@ export default function CreateProject() {
     description: Yup.string().required("Required"),
     impacts: Yup.array().of(Yup.string().required("Required")),
     outcomes: Yup.array().of(Yup.string().required("Required")),
-    beneficiaryGroups: Yup.array().of(
+    beneficiaries: Yup.array().of(
       Yup.object().shape({
-        demoName: Yup.string().required("Required"),
-        groupChange: Yup.array().of(Yup.string().required("Required")),
+        name: Yup.string().required("Required"),
+        lifeChange: Yup.array().of(Yup.string().required("Required")),
         demographics: Yup.array().of(
           Yup.object().shape({
-            demographic: Yup.string().required("Required"),
+            name: Yup.string().required("Required"),
             operator: Yup.string().required("Required"),
             value: Yup.string().required("Required"),
           })
@@ -37,6 +37,29 @@ export default function CreateProject() {
       })
     ),
   });
+
+  const onSubmit = async (values, methods) => {
+    try {
+      const token = await getAccessTokenSilently();
+      const res = await UserService.createProject(
+        values.orgId,
+        values.projectName,
+        values.description,
+        values.impacts,
+        values.outcomes,
+        values.beneficiaries,
+        token
+      );
+
+      // methods.resetForm();
+
+      // move to next project form page
+      // history.push("/setup/createProject2");
+    } catch (err) {
+      const errMessage = err.response.data["error"];
+      setServerMessage(errMessage);
+    }
+  };
 
   return (
     <div className="container">
@@ -56,47 +79,21 @@ export default function CreateProject() {
           </legend>
           <Formik
             initialValues={{
-              orgId: user.orgId,
+              orgId: user.currentOrgId,
               projectName: "",
               description: "",
               impacts: [""],
               outcomes: [""],
-              beneficiaryGroups: [
+              beneficiaries: [
                 {
-                  demoName: "",
-                  groupChange: [""],
-                  demographics: [{ demographic: "", operator: "", value: "" }],
+                  name: "",
+                  lifeChange: [""],
+                  demographics: [{ name: "", operator: "", value: "" }],
                 },
               ],
             }}
             validationSchema={validationSchema}
-            onSubmit={async (values, methods) => {
-              try {
-                const token = await getAccessTokenSilently();
-                const res = await UserService.createProject(
-                  values.orgId,
-                  values.projectName,
-                  values.description,
-                  values.impacts,
-                  values.outcomes,
-                  values.beneficiaryGroups,
-                  token
-                );
-                // console.log(res);
-
-                // setUser((state) => {
-                //   return { ...state, currentProjectId: res.data };
-                // });
-
-                methods.resetForm();
-
-                // move to next project form page
-                history.push("/setup/createProject2");
-              } catch (err) {
-                const errMessage = err.response.data["error"];
-                setServerMessage(errMessage);
-              }
-            }}
+            onSubmit={onSubmit}
           >
             {(formik) => (
               <Form onSubmit={formik.handleSubmit} className="mx-auto">
@@ -228,7 +225,7 @@ export default function CreateProject() {
                     </Accordion.Toggle>
                     <Accordion.Collapse eventKey="0">
                       <Card.Body>
-                        <FieldArray name="beneficiaryGroups">
+                        <FieldArray name="beneficiaries">
                           {(arrayHelpers) => (
                             <BeneficiaryGroups arrayHelpers={arrayHelpers} />
                           )}
